@@ -14,8 +14,8 @@ local action_state = require("telescope.actions.state")
 -- TODO:
 -- 1. Find all id links in containing file,
 -- 2. Iterate through all id links, create a SQL record for each id
--- with this format [{ fileId, id, filePath, idStartPos, idEndPos, idRow }]
--- 3. Backlink. Get all records in SQL and through all to see if id === current file id
+-- with this format { [linkId]: { fileId, id, filePath, idStartPos, idEndPos, idRow } }
+-- 3. Backlink. Get all records in SQL and through all to see if current file id exist in { [linkId] ... } this table
 
 local user_config = {}
 
