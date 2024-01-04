@@ -56,3 +56,5 @@
 ** What features are supported?
    - Find node: =org_roam_node_find=
    - Capture node: =org_roam_capture=
+
+** TODO If ~/OrgRoam folder not found, create one
