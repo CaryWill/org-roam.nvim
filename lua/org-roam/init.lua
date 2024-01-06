@@ -11,6 +11,9 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
+local file_table = "org_roam_file_table"
+local id_table = "org_roam_id_table"
+
 -- TODO:
 -- 1. Find all id links in containing file,
 -- 2. Iterate through all id links, create a SQL record for each id
@@ -155,6 +158,9 @@ local function org_roam_capture(title)
 end
 
 local function org_roam_node_find()
+    -- TODO: I can just update tables inside this function
+    -- although the first time to build up the database
+    -- maybe slow but I will use sha1 to cache
     local nodes = sqlite.with_open(user_config.org_roam_database_file, function(db)
         local nodes = db:eval([[SELECT file, title, pos FROM nodes;]])
         local node_aliases = db:eval([[
