@@ -68,6 +68,8 @@
 ** TODO Heading backlink, currently only works for file
 ** TODO Network graph view
    Seems hard to do in Neovim itself? Since the basic render unit is a box cell.
+   Maybe you can count on an external program, like just open a new emacs window
+   for this purpose.
    - [[https://cmdln.org/2023/03/25/how-i-org-in-2023/][org-roam-ui]]
 ** TODO Maybe consider status bar to show how many backlink does current file have?
 
