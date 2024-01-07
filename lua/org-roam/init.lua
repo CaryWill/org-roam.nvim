@@ -51,7 +51,7 @@ local function org_roam_capture(title)
 	local uuid = utils.get_uuid()
 	local date_str = os.date("[%Y-%m-%d %a %H:%M]")
 	-- TODO: support template, you can refer to neovim orgmode's template impl
-	local node_head = ":PROPERTIES:\n:ID:        " .. uuid .. "\n:END:\n#+title: " .. title .. "\n#+date: " .. date_str
+	local node_head = ":PROPERTIES:\n:ID: " .. uuid .. "\n:END:\n#+title: " .. title .. "\n#+date: " .. date_str
 	local file_path = (user_config.org_roam_capture_directory or user_config.org_roam_directory) .. filename
 	local fp, err = io.open(file_path, "w")
 	if fp == nil then
