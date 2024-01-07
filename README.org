@@ -65,6 +65,7 @@
 ** TODO refactor
 ** TODO add test case
 ** TODO completion
+** TODO Heading backlink, currently only works for file
 
 ** What features are not supported yet?
 

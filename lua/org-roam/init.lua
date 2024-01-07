@@ -67,90 +67,29 @@ local function org_roam_capture(title)
 		fp:write(node_head)
 		fp:close()
 
-		-- Do we need to update the hash when file changes?
-		-- Is this verified in any way?
-		local hash = sha1.sha1(node_head)
-
 		local stat = luv.fs_stat(file_path)
 		if not stat then
 			print("ERROR: unable to get file stats")
 		end
 
+		-- TODO: maybe refactor to this structure
+		-- id = uuid,
+		-- evel = level,
+		-- os = pos,
+		-- ile = file_path,
+		-- itle = title,
+		-- roperties = properties,
 		-- Source: emacs-29.1/src/timefns.c:582
-		local s = stat.atime.sec
-		local ns = stat.atime.nsec
-		local atime = "("
-			.. bit.rshift(s, 16)
-			.. " "
-			.. bit.band(s, bit.lshift(1, 16) - 1)
-			.. " "
-			.. math.floor(ns / 1000)
-			.. " "
-			.. ns % 1000 * 1000
-			.. ")"
-
-		s = stat.mtime.sec
-		ns = stat.atime.nsec
-		local mtime = "("
-			.. bit.rshift(s, 16)
-			.. " "
-			.. bit.band(s, bit.lshift(1, 16) - 1)
-			.. " "
-			.. math.floor(ns / 1000)
-			.. " "
-			.. ns % 1000 * 1000
-			.. ")"
 
 		-- File nodes have level 0
 		-- Heading nodes have their heading level as level
-		local level = 0
+		-- local level = 0
 
 		-- Position of the node
 		-- File nodes at pos 1
 		-- Heading nodes have different position at file depending on where the
 		-- first character is of that heading
-		local pos = 1
-
-		-- Why so complicated?
-		local properties = '(("CATEGORY . "'
-			.. category
-			.. '") ("ID" . "'
-			.. uuid
-			.. '") ("BLOCKED" . "") ("FILE" . "'
-			.. filename
-			.. '") ("PRIORITY" . "B"))'
-
-		sqlite.with_open(user_config.org_roam_database_file, function(db)
-			local ok = db:eval(
-				"INSERT INTO files(file, title, hash, atime, mtime) " .. "VALUES(:file, :title, :hash, :atime, :mtime);",
-				{
-					file = file_path,
-					title = title,
-					hash = hash,
-					atime = atime,
-					mtime = mtime,
-				}
-			)
-			if not ok then
-				-- TODO: it should have an early return?
-				print("ERROR: Something went wrong with inserting data into `files' table")
-			end
-			ok = db:eval(
-				"INSERT INTO nodes(id, level, pos, file, title, properties) "
-					.. "VALUES(:id, :level, :pos, :file, :title, :properties);",
-				{
-					id = uuid,
-					level = level,
-					pos = pos,
-					file = file_path,
-					title = title,
-					properties = properties,
-				}
-			)
-			if not ok then
-				print("ERROR: Something went wrong with inserting data into `nodes' table")
-			end
-		end)
+		-- local pos = 1
 
 		-- go to the created file editing
 		vim.cmd.edit(file_path)
