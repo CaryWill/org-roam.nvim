@@ -161,63 +161,35 @@ local function org_roam_node_find()
 	-- TODO: I can just update tables inside this function
 	-- although the first time to build up the database
 	-- maybe slow but I will use sha1 to cache
-	sqlite.open(user_config.org_roam_database_file)
-	sqlite.close()
 
-	local telescope_picker = function(opts)
-		opts = opts or {}
-		pickers
-			.new(opts, {
-				prompt_title = "Find Node",
-				finder = finders.new_table({
-					results = nodes,
-					entry_maker = function(entry)
-						-- because of the way org-roam stores these in database
-						entry.title = string.sub(entry.title, 2, -2)
-						entry.file = string.sub(entry.file, 2, -2)
-
-						return {
-							value = entry,
-							display = entry.title,
-							ordinal = entry.title,
-						}
-					end,
-				}),
-
-				attach_mappings = function(prompt_bufnr, _)
-					actions.select_default:replace(function()
-						actions.close(prompt_bufnr)
-						local selection = action_state.get_selected_entry()
-						if selection == nil then
-							local title = action_state.get_current_line()
-							org_roam_capture(title)
-						else
-							local file = selection.value.file
-							local pos = selection.value.pos
-							local row = 1
-
-							for line in io.lines(file) do
-								if pos < line:len() then
-									break
-								else
-									pos = pos - line:len()
-								end
-								row = row + 1
-							end
-
-							vim.cmd.edit(selection.value.file)
-							-- TODO Set the cursor in correct place
-							-- aka mimic emacs `goto-char' function
-							-- vim.api.nvim_win_set_cursor(0, { row, 0 })
-						end
-					end)
-					return true
-				end,
-				sorter = conf.generic_sorter(opts),
-			})
-			:find()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	local content = table.concat(lines, "\n")
+	local id = utils.find_file_id(content)
+	local back_links = utils.get_back_links(id, user_config.org_roam_database_file, "example_table")
+	local locations = {}
+	for _, back_link in ipairs(back_links) do
+		local line_content = utils.read_lines_from_file(back_link.file_path, back_link.start_row, back_link.end_row)[1]
+		table.insert(locations, {
+			filename = back_link.file_path,
+			lnum = back_link.start_row,
+			col = back_link.start_col,
+			text = line_content,
+		})
 	end
-	telescope_picker()
+
+	-- Clear existing location list
+	vim.fn.setloclist(0, {})
+
+	-- Add new entries to the location list
+	for _, loc in ipairs(locations) do
+		vim.fn.setloclist(0, { loc }, "a")
+	end
+	vim.cmd("lopen")
+
+	-- TODO: use telescope or location list
+	-- the author use telescope here, for simplicity
+	-- I use location list first here
 end
 
 return {
