@@ -37,7 +37,7 @@ local file_content1 = [[
   Some content here.
 
 ** Subheadline
-   More content.
+   More content. \[\[\[id:test \]\]\[this is a link id\]\]
 
 * Another headline
   Different content.
