@@ -2,8 +2,6 @@ local utils = require("org-roam.utils")
 local default_args = require("org-roam.default-args")
 
 local luv = require("luv")
-local sqlite = require("sqlite.db")
-local sha1 = require("sha1")
 
 -- TODO:
 -- 1. Find all id links in containing file,
@@ -49,8 +47,8 @@ local function org_roam_capture(title)
 
 	local uuid = utils.get_uuid()
 	local date_str = os.date("[%Y-%m-%d %a %H:%M]")
+	-- TODO: support template, you can refer to neovim orgmode's template impl
 	local node_head = ":PROPERTIES:\n:ID:        " .. uuid .. "\n:END:\n#+title: " .. title .. "\n#+date: " .. date_str
-
 	local file_path = user_config.org_roam_directory .. filename
 	local fp, err = io.open(file_path, "w")
 	if fp == nil then
@@ -58,11 +56,6 @@ local function org_roam_capture(title)
 	else
 		fp:write(node_head)
 		fp:close()
-
-		local stat = luv.fs_stat(file_path)
-		if not stat then
-			print("ERROR: unable to get file stats")
-		end
 
 		-- TODO: maybe refactor to this structure
 		-- id = uuid,

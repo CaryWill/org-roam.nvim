@@ -67,10 +67,15 @@
 ** TODO completion
 ** TODO Heading backlink, currently only works for file
 ** TODO Network graph view
+   Seems hard to do in Neovim itself? Since the basic render unit is a box cell.
    - [[https://cmdln.org/2023/03/25/how-i-org-in-2023/][org-roam-ui]]
+** TODO Maybe consider status bar to show how many backlink does current file have?
 
 ** What features are not supported yet?
 
 
 ** Related links
    - [[https://wohanley.com/posts/org-setup/][My current org-mode setup]]
+   - [[https://systemcrafters.net/build-a-second-brain-in-emacs/capturing-notes-efficiently/][Capturing Notes Efficiently with Org Roam]]
+   - [[https://github.com/org-roam/org-roam-ui][Graph visualization]]
+   - [[https://github.com/kkharji/sqlite.lua][SQLite lua]]
