@@ -34,7 +34,7 @@ local function org_roam_capture(title)
 	end
 
 	-- Replace all non-alphanumeric characters with an underscore
-	local filename = os.date("%Y%m%d%H%M%S") .. "_" .. title:gsub("%A", "_")
+	local filename = title:gsub("%A", "_") .. "_" .. os.date("%Y%m%d%H%M%S")
 	local category = ""
 	-- TODO: is this OS limit or?
 	if filename:len() > 251 then
