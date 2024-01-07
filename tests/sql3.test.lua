@@ -9,8 +9,8 @@ local utils = require("org-roam.utils")
 
 describe("sql", function()
 	it("open", function()
+		local db = sqlite:open(dbpath)
 		utils.process_folder(roam_folder, function(matches)
-			local db = sqlite:open(dbpath)
 			if not db:exists(table_name) then
 				db:create(table_name, {
 					id = { "int", "primary", "key" },
@@ -47,11 +47,10 @@ describe("sql", function()
 					})
 					-- TODO: I dont know why I cannot get with_open to work
 					-- db:close should be put at the end
-					db:close()
 				end
 			end
 		end)
-
+		db:close()
 		-- vim.print(vim.inspect(records))
 		-- assert.equals(records, true)
 		-- db:insert(table_name, { id = 1234556, filepath = "1234", fileid = "1234", idlinks = "adf2" })
