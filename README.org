@@ -62,6 +62,9 @@
    I read a single file, again and again, if the file is large, it may be a problem,
    currently, I focus on logic only, performance will be the next one to be 
    tackled
+** TODO refactor
+** TODO add test case
+** TODO completion
 
 ** What features are not supported yet?
 

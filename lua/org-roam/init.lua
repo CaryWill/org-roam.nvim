@@ -158,6 +158,9 @@ local function org_roam_capture(title)
 end
 
 local function org_roam_node_find()
+	-- build the database
+	utils.build_database(user_config.org_roam_database_file, user_config.org_roam_directory, "example_table")
+
 	-- TODO: I can just update tables inside this function
 	-- although the first time to build up the database
 	-- maybe slow but I will use sha1 to cache

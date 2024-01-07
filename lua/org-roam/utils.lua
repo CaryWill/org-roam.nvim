@@ -170,16 +170,16 @@ M.get_back_links = get_back_links
 
 local function build_database(dbpath, roam_folder, table_name)
 	local db = sqlite:open(dbpath)
-	process_folder(roam_folder, function(matches)
-		if not db:exists(table_name) then
-			db:create(table_name, {
-				id = { "int", "primary", "key" },
-				file_path = "text",
-				file_id = "text",
-				id_links = "text",
-			})
-		end
+	if not db:exists(table_name) then
+		db:create(table_name, {
+			id = { "int", "primary", "key" },
+			file_path = "text",
+			file_id = "text",
+			id_links = "text",
+		})
+	end
 
+	process_folder(roam_folder, function(matches)
 		if matches.file_id ~= nil then
 			local records = db:select(table_name, { where = { file_id = matches.file_id } })
 
@@ -200,17 +200,14 @@ local function build_database(dbpath, roam_folder, table_name)
 				-- I finnally found it's because I made change using the App
 				-- but did not click the `Write Changes` button
 				--
-				-- db:update(table_name, {
-				-- 	where = { file_id = matches.file_id },
-				-- 	set = {
-				-- 		file_id = matches.file_id,
-				-- 		file_path = matches.file_path,
-				-- 		-- TODO: if you need to modify the id_links
-				-- 		-- then decode it first then encode after
-				-- 		-- finished modify
-				-- 		id_links = matches.id_links,
-				-- 	},
-				-- })
+				db:update(table_name, {
+					where = { file_id = matches.file_id },
+					set = {
+						file_id = matches.file_id,
+						file_path = matches.file_path,
+						id_links = vim.json.encode(matches.id_links),
+					},
+				})
 				--
 				-- TODO: I dont know why I cannot get with_open to work
 				-- db:close should be put at the end
