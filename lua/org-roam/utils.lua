@@ -60,6 +60,29 @@ local function is_org_file(filePath)
     return string.sub(filePath, -4) == ".org"
 end
 
+local function read_file_content(filepath)
+    local file = io.open(filepath, "r") -- Open the file for reading
+    if not file then
+        print("Error: Could not open file at path " .. filepath)
+        return nil
+    end
+
+    local content = file:read("*a") -- Read the entire content of the file
+    file:close() -- Close the file
+    return content
+end
+
+local function find_file_id(file_content)
+    local properties = file_content:match(":PROPERTIES:(.-):END:")
+    if properties then
+        local id_pattern = ":ID:%s+(%S+)"
+        local id = properties:match(id_pattern)
+        return id
+    else
+        return nil
+    end
+end
+
 local function process_file(filepath)
     -- process orgfile only
     if is_org_file(filepath) == false then
@@ -67,18 +90,21 @@ local function process_file(filepath)
     end
 
     local file = io.open(filepath, "r")
+    -- TODO: performance
+    local file_content = read_file_content(filepath)
     local matches = {}
     local line_number = 0
+    local file_id = find_file_id(file_content)
 
     if file then
         for line in file:lines() do
-            print(line)
             local line_content = line
             line_number = line_number + 1
             local match = org_id_link_match(line_content)
             if match ~= nil then
                 match.start_row = line_number
                 match.end_row = line_number
+                match.file_id = file_id
                 table.insert(matches, match)
             end
         end
@@ -89,7 +115,6 @@ local function process_file(filepath)
     else
         print("Cannot open file")
     end
-    return #matches == 0 and nil or matches
 end
 
 local function process_folder(folderPath)
@@ -105,7 +130,7 @@ local function process_folder(folderPath)
                 if entry.type == "file" then
                     process_file(filePath)
                 elseif entry.type == "directory" then
-                    processFolder(filePath)
+                    process_folder(filePath)
                 end
             end
         end
@@ -114,5 +139,6 @@ local function process_folder(folderPath)
 end
 
 M.process_folder = process_folder
+M.find_file_id = find_file_id
 
 return M
