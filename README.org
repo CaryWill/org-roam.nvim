@@ -29,7 +29,7 @@
      })
    #+END_SRC
 
-* Installation with lazy.nvim
+** Installation with lazy.nvim
   #+BEGIN_SRC lua
     {
         "SyedFasiuddin/org-roam.nvim",
@@ -70,12 +70,16 @@
    Seems hard to do in Neovim itself? Since the basic render unit is a box cell.
    Maybe you can count on an external program, like just open a new emacs window
    for this purpose. Can I just like org-roam-ui, using browser and websocket to
-   do it?
+   do it?  There's a =/Users/cary/workspace/github/org-roam-ui/org-roam-ui.el= 
+   in org-roam-ui, that does the client thing in emacs, but I am not familir with
+   lisp, and it seems like it need me to have some properties like, level and pos
+   ... seems like the original author does. If I can have the same structure in
+   =/Users/cary/workspace/github/org-roam-ui/org-roam-ui.el= this file, then,
+   it will work, since org-roam-ui is just a frontend graph viewer, it depends on
    - [[https://cmdln.org/2023/03/25/how-i-org-in-2023/][org-roam-ui]]
 ** TODO Maybe consider status bar to show how many backlink does current file have?
 
 ** What features are not supported yet?
-
 
 ** Related links
    - [[https://wohanley.com/posts/org-setup/][My current org-mode setup]]
