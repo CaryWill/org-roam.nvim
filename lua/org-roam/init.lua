@@ -18,6 +18,9 @@ local function setup(args)
 	end
 
 	user_config.org_roam_directory = luv.fs_realpath(utils.expand_file_name(user_config.org_roam_directory)) .. "/"
+	user_config.org_roam_capture_directory = luv.fs_realpath(
+		utils.expand_file_name(user_config.org_roam_capture_directory)
+	) .. "/"
 	-- Why concatenate '/' ?
 	-- Because `fs_realpath' return something like `/path/to/dir'
 	-- And when creating new nodes(files) we concatenate file name with it like:
@@ -49,7 +52,7 @@ local function org_roam_capture(title)
 	local date_str = os.date("[%Y-%m-%d %a %H:%M]")
 	-- TODO: support template, you can refer to neovim orgmode's template impl
 	local node_head = ":PROPERTIES:\n:ID:        " .. uuid .. "\n:END:\n#+title: " .. title .. "\n#+date: " .. date_str
-	local file_path = user_config.org_roam_directory .. filename
+	local file_path = (user_config.org_roam_capture_directory or user_config.org_roam_directory) .. filename
 	local fp, err = io.open(file_path, "w")
 	if fp == nil then
 		print("Error: " .. err)
