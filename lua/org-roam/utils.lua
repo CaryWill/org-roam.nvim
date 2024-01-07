@@ -95,6 +95,11 @@ local function process_file(filepath, post_hook)
 	local matches = {}
 	local line_number = 0
 	local file_id = find_file_id(file_content)
+	local returned = {
+		file_path = filepath,
+		file_id = file_id,
+		id_links = matches,
+	}
 
 	if file then
 		for line in file:lines() do
@@ -114,17 +119,13 @@ local function process_file(filepath, post_hook)
 		file:close()
 
 		if post_hook ~= nil then
-			post_hook(matches)
+			post_hook(returned)
 		end
 	else
 		print("Cannot open file")
 	end
 
-	return {
-		file_path = filepath,
-		file_id = file_id,
-		ids = matches,
-	}
+	return returned
 end
 
 local function process_folder(folderPath, post_hook)
