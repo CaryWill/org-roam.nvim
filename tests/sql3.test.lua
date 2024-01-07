@@ -22,7 +22,6 @@ describe("sql", function()
 
 			if matches.file_id ~= nil then
 				local records = db:select(table_name, { where = { file_id = matches.file_id } })
-				print(records, matches.file_id, 123213)
 
 				if #records == 0 then
 					db:insert(table_name, {
@@ -32,23 +31,22 @@ describe("sql", function()
 						id_links = vim.json.encode(matches.id_links),
 					})
 				else
-					-- db:update(table_name, {
-					-- 	where = { file_id = matches.file_id },
-					-- 	set = {
-					-- 		file_id = matches.file_id,
-					-- 		file_path = matches.file_path,
-					-- 		id_links = vim.json.encode(matches.id_links),
-					-- 	},
-					-- })
-					-- update
-					-- create a record
-					-- db:insert(table_name, {
-					-- 	file_id = matches.file_id,
-					-- 	file_path = matches.file_path,
-					-- 	id_links = vim.json.encode(matches.id_links),
-					-- })
-					-- TODO: db:close should be put at the end
-					-- I dont know why I cannot get with_open to work
+					-- NOTE: some times I could not update
+					-- because it says the database is locked
+					-- I guess, because there's an ongoing
+					-- connection connected to the database
+					-- which I opened using an App(DB Browser for SQLite)
+					-- to view the  data
+					db:update(table_name, {
+						where = { file_id = matches.file_id },
+						set = {
+							file_id = matches.file_id,
+							file_path = matches.file_path,
+							id_links = vim.json.encode(matches.id_links),
+						},
+					})
+					-- TODO: I dont know why I cannot get with_open to work
+					-- db:close should be put at the end
 					db:close()
 				end
 			end
