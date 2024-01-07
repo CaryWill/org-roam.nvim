@@ -66,6 +66,11 @@
 ** TODO add test case
 ** TODO completion
 ** TODO Heading backlink, currently only works for file
+** TODO Network graph view
+   - [[https://cmdln.org/2023/03/25/how-i-org-in-2023/][org-roam-ui]]
 
 ** What features are not supported yet?
 
+
+** Related links
+   - [[https://wohanley.com/posts/org-setup/][My current org-mode setup]]

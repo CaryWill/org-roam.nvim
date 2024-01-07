@@ -5,15 +5,6 @@ local luv = require("luv")
 local sqlite = require("sqlite.db")
 local sha1 = require("sha1")
 
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
-
-local file_table = "org_roam_file_table"
-local id_table = "org_roam_id_table"
-
 -- TODO:
 -- 1. Find all id links in containing file,
 -- 2. Iterate through all id links, create a SQL record for each id
@@ -57,7 +48,8 @@ local function org_roam_capture(title)
 	end
 
 	local uuid = utils.get_uuid()
-	local node_head = ":PROPERTIES:\n:ID:        " .. uuid .. "\n:END:\n#+title: " .. title .. "\n"
+	local date_str = os.date("[%Y-%m-%d %a %H:%M]")
+	local node_head = ":PROPERTIES:\n:ID:        " .. uuid .. "\n:END:\n#+title: " .. title .. "\n#+date: " .. date_str
 
 	local file_path = user_config.org_roam_directory .. filename
 	local fp, err = io.open(file_path, "w")
