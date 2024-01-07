@@ -83,7 +83,7 @@ local function find_file_id(file_content)
 	end
 end
 
-local function process_file(filepath)
+local function process_file(filepath, post_hook)
 	-- process orgfile only
 	if is_org_file(filepath) == false then
 		return nil
@@ -112,6 +112,10 @@ local function process_file(filepath)
 		-- print(vim.json.encode(matches))
 		-- print(vim.inspect(vim.json.decode(vim.json.encode(matches))))
 		file:close()
+
+		if post_hook ~= nil then
+			post_hook(matches)
+		end
 	else
 		print("Cannot open file")
 	end
@@ -123,8 +127,9 @@ local function process_file(filepath)
 	}
 end
 
-local function process_folder(folderPath)
-	local handle = vim.loop.fs_opendir(folderPath, nil, 100)
+local function process_folder(folderPath, post_hook)
+	local expanded_folder = vim.fn.expand(folderPath)
+	local handle = vim.loop.fs_opendir(expanded_folder, nil, 100)
 	if handle then
 		while true do
 			local entries = vim.loop.fs_readdir(handle)
@@ -132,11 +137,11 @@ local function process_folder(folderPath)
 				break
 			end
 			for _, entry in ipairs(entries) do
-				local filePath = folderPath .. "/" .. entry.name
+				local filePath = expanded_folder .. "/" .. entry.name
 				if entry.type == "file" then
-					process_file(filePath)
+					process_file(filePath, post_hook)
 				elseif entry.type == "directory" then
-					process_folder(filePath)
+					process_folder(filePath, post_hook)
 				end
 			end
 		end
