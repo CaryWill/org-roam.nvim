@@ -58,3 +58,10 @@
    - Capture node: =org_roam_capture=
 
 ** TODO If ~/OrgRoam folder not found, create one
+** TODO Performance issue
+   I read a single file, again and again, if the file is large, it may be a problem,
+   currently, I focus on logic only, performance will be the next one to be 
+   tackled
+
+** What features are not supported yet?
+
