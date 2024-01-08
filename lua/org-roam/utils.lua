@@ -169,6 +169,13 @@ end
 M.get_back_links = get_back_links
 
 local function build_database(dbpath, roam_folder, table_name)
+	-- create db file if not exists
+	local is_file_exists = vim.fn.filereadable(vim.fn.expand(dbpath))
+	if is_file_exists == 0 then
+		vim.fn.mkdir(vim.fn.fnamemodify(dbpath, ":p:h"), "p")
+		os.execute("touch " .. vim.fn.expand(dbpath))
+	end
+
 	local db = sqlite:open(dbpath)
 	if not db:exists(table_name) then
 		db:create(table_name, {
