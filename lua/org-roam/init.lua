@@ -17,10 +17,11 @@ local function setup(args)
 		print("Org Roam Error: Please provide `org_roam_directory`")
 	end
 
-	user_config.org_roam_directory = luv.fs_realpath(utils.expand_file_name(user_config.org_roam_directory)) .. "/"
 	user_config.org_roam_capture_directory = luv.fs_realpath(
-		utils.expand_file_name(user_config.org_roam_capture_directory)
+		utils.expand_file_name(user_config.org_roam_capture_directory or user_config.org_roam_directory)
 	) .. "/"
+
+	user_config.org_roam_directory = luv.fs_realpath(utils.expand_file_name(user_config.org_roam_directory)) .. "/"
 	-- Why concatenate '/' ?
 	-- Because `fs_realpath' return something like `/path/to/dir'
 	-- And when creating new nodes(files) we concatenate file name with it like:
