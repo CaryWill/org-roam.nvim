@@ -1,3 +1,5 @@
+local sqlite = require("sqlite")
+
 local M = {}
 
 -- Credits: https://github.com/kkharji/sqlite.lua
@@ -148,7 +150,6 @@ local function process_folder(folderPath, post_hook)
 	end
 end
 
-local sqlite = require("sqlite")
 local function get_back_links(current_file_id, dbpath, table_name)
 	local db = sqlite:open(dbpath)
 	local back_links = {}
