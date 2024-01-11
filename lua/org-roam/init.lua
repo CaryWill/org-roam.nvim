@@ -189,6 +189,9 @@ local orgRoamGraphData = {
 }
 
 _G.GetLatestGraphData = function()
+	-- TODO: build database will be time consuming if your notes grow larger?
+	-- for now just rebuild everytime this function is called
+	utils.build_database(user_config.org_roam_database_file, user_config.org_roam_directory, "example_table")
 	local db = sqlite:open(user_config.org_roam_database_file)
 	local records = db:select("example_table")
 	db:close()
