@@ -117,12 +117,19 @@ local function org_roam_node_find()
 	for _, loc in ipairs(locations) do
 		vim.fn.setloclist(0, { loc }, "a")
 	end
-	vim.cmd("lopen")
 
-	local db = sqlite:open(user_config.org_roam_database_file)
-	local records = db:select("example_table")
-	db:close()
-	vim.fn.UpdateGraphData(vim.json.encode(records))
+	if #locations ~= 0 then
+		vim.cmd("lopen")
+	else
+		vim.print("no backlink found!")
+	end
+
+	-- NOTE: moved to a global function
+	-- for other plugin to call, like my nodejs neovim plugin
+	-- local db = sqlite:open(user_config.org_roam_database_file)
+	-- local records = db:select("example_table")
+	-- db:close()
+	-- vim.fn.UpdateGraphData(vim.json.encode(records))
 
 	-- TODO: use telescope or location list
 	-- the author use telescope here, for simplicity
@@ -177,6 +184,14 @@ local orgRoamGraphData = {
 	},
 	tags = {},
 }
+
+_G.GetLatestGraphData = function()
+	local db = sqlite:open(user_config.org_roam_database_file)
+	local records = db:select("example_table")
+	db:close()
+	return vim.json.encode(records)
+end
+
 return {
 	setup = setup,
 	org_roam_capture = org_roam_capture,
