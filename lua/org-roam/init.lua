@@ -29,6 +29,9 @@ local function setup(args)
 	-- Which is not what we assume there, what we assume is:
 	--   /path/to/dir/ .. file_name
 	-- And so concatenate '/' at the end
+
+	-- other plugin can use this config
+	vim.g.org_roam_config = user_config
 end
 
 -- capture is for creating files by templates
