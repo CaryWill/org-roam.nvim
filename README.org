@@ -66,6 +66,7 @@
 ** TODO add test case
 ** TODO completion
 ** TODO Heading backlink, currently only works for file
+** TODO Parse file ID properties can use neovim-orgmode parser
 ** TODO Network graph view
    Seems hard to do in Neovim itself? Since the basic render unit is a box cell.
    Maybe you can count on an external program, like just open a new emacs window
