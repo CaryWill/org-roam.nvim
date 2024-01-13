@@ -40,6 +40,18 @@ local function org_roam_capture(title)
 		title = vim.fn.input("Enter the title: ")
 	end
 
+	-- capture zettles
+	local selected_zettle_path = ""
+	if user_config.org_roam_zettle_paths ~= nil or #user_config.org_roam_zettle_paths > 0 then
+		local org_roam_zettle_paths = user_config.org_roam_zettle_paths
+		for i, item in ipairs(org_roam_zettle_paths) do
+			org_roam_zettle_paths[i] = string.format("%d. %s", i, item)
+		end
+		-- Prompt the user with a selection list
+		local choice = vim.fn.inputlist(org_roam_zettle_paths)
+		selected_zettle_path = org_roam_zettle_paths[choice]:match("%d+%. (.+)") .. "/"
+	end
+
 	-- Replace all non-alphanumeric characters with an underscore
 	-- local filename = title:gsub("%A", "_") .. "_" .. os.date("%Y%m%d%H%M%S")
 	local filename = title:gsub("%A", "_")
@@ -57,7 +69,10 @@ local function org_roam_capture(title)
 	local date_str = os.date("[%Y-%m-%d %a %H:%M]")
 	-- TODO: support template, you can refer to neovim orgmode's template impl
 	local node_head = ":PROPERTIES:\n:ID: " .. uuid .. "\n:END:\n#+title: " .. title .. "\n#+date: " .. date_str
-	local file_path = (user_config.org_roam_capture_directory or user_config.org_roam_directory) .. filename
+	local file_path = (user_config.org_roam_capture_directory or user_config.org_roam_directory)
+		.. selected_zettle_path
+		.. filename
+	-- TODO: make directory if directory not exist(you can use the fn in utils.lua file)
 	local fp, err = io.open(file_path, "w")
 	if fp == nil then
 		print("Error: " .. err)
