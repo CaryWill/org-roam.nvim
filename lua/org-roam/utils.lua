@@ -182,6 +182,12 @@ end
 
 M.get_back_links = get_back_links
 
+-- for other places like lualine that want to display
+-- backlinks count for current file
+-- create this variable is for performance purpose
+-- everytime the db get's updated, we cached here
+local backlinksRefs = {}
+vim.g.org_roam_backlinks = backlinksRefs
 local function build_database(dbpath, roam_folder, table_name)
 	-- create db file if not exists
 	local is_file_exists = vim.fn.filereadable(vim.fn.expand(dbpath))
@@ -197,7 +203,6 @@ local function build_database(dbpath, roam_folder, table_name)
 			file_path = "text",
 			file_id = "text",
 			id_links = "text",
-			file_title = "text",
 			title = "text",
 		})
 	end
@@ -236,6 +241,24 @@ local function build_database(dbpath, roam_folder, table_name)
 				--
 				-- TODO: I dont know why I cannot get with_open to work
 				-- db:close should be put at the end
+			end
+
+			local back_links = {}
+			local _records = db:select(table_name)
+			for index, value in ipairs(_records) do
+				local id_links = vim.json.decode(value.id_links)
+				for _, id_link in ipairs(id_links) do
+					if id_link.id == matches.file_id then
+						table.insert(back_links, id_link)
+					end
+				end
+			end
+			-- cache the info for other places to consume
+			-- remove // in the path string
+			local normalized_file_path = string.gsub(matches.file_path, "//", "/")
+			if normalized_file_path ~= nil then
+				backlinksRefs[normalized_file_path] = #back_links
+				vim.g.org_roam_backlinks = backlinksRefs
 			end
 		end
 	end)

@@ -111,7 +111,12 @@ local function org_roam_capture(title)
 end
 
 -- find all backlinks
-local function org_roam_buffer_toggle()
+local function org_roam_buffer_toggle(opts)
+	opts = opts or {}
+	local open_loc = opts.open_loc
+	if open_loc == nil then
+		open_loc = true
+	end
 	-- build the database
 	utils.build_database(user_config.org_roam_database_file, user_config.org_roam_directory, "example_table")
 
@@ -142,12 +147,13 @@ local function org_roam_buffer_toggle()
 	-- Clear existing location list
 	vim.fn.setloclist(0, {})
 
+	vim.g.locations = locations
 	-- Add new entries to the location list
 	for _, loc in ipairs(locations) do
 		vim.fn.setloclist(0, { loc }, "a")
 	end
 
-	if #locations ~= 0 then
+	if #locations ~= 0 and open_loc then
 		vim.cmd("lopen")
 	else
 		vim.print("no backlink found!")
