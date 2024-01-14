@@ -79,9 +79,10 @@ local function org_roam_capture(title)
 	-- other properties
 	local other_properties = ""
 	-- i dont know what to call it, like #+filetags
-	local others = "\n#+filetags: :draft:"
+	local others = ""
 	if choice_name ~= nil and choice_name == "main" then
 		other_properties = ""
+		others = "\n#+filetags: :draft:\n"
 	end
 
 	local node_head = ":PROPERTIES:\n:ID: "
@@ -93,7 +94,6 @@ local function org_roam_capture(title)
 		.. "\n#+date: "
 		.. date_str
 		.. others
-		.. "\n"
 	local file_path = (user_config.org_roam_capture_directory or user_config.org_roam_directory)
 		.. selected_zettle_path
 		.. filename
