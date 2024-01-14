@@ -221,11 +221,14 @@ local function org_roam_node_find(opts)
 							-- insert link
 							if link_type then
 								local buffer = 0
-								local start_row = opts.line
-								local end_row = start_row
-								local start_col = opts.col
-								local end_col = #selection.value.id
-								utils.insert_text_at(buffer, selection.value.id)
+								local text = "[["
+									.. link_type
+									.. ":"
+									.. selection.value.id
+									.. "]["
+									.. selection.value.title
+									.. "]]"
+								utils.insert_text_at(buffer, text)
 							else
 								vim.cmd.edit(selection.value.file)
 							end

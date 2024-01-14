@@ -244,11 +244,15 @@ M.build_database = build_database
 M.process_folder = process_folder
 M.find_file_id = find_file_id
 
+local function get_letter_at_index(str, index)
+	return string.sub(str, index, index)
+end
 local function get_line_from_buffer(buffer, line_number)
 	local zero_based_line = line_number - 1
 	local lines = vim.api.nvim_buf_get_lines(buffer, zero_based_line, line_number, false)
 	return lines[1]
 end
+-- insert white space around link
 local function insert_text_at_cursor(buffer, text)
 	local line = vim.api.nvim_win_get_cursor(0)[1]
 	local col = vim.api.nvim_win_get_cursor(0)[2]
@@ -258,9 +262,21 @@ local function insert_text_at_cursor(buffer, text)
 	local split_point = col
 	local left = current_line:sub(1, split_point)
 	local right = current_line:sub(split_point + 1)
-	local complete_text = left .. text .. right
-	vim.g.t = { left, right, text }
 
+	local padding_left = ""
+	local padding_right = ""
+	local letter_at_cursor_left = get_letter_at_index(current_line, split_point - 1)
+	local letter_at_cursor_right = get_letter_at_index(current_line, split_point + 1)
+
+	if letter_at_cursor_left ~= " " then
+		padding_left = " "
+	end
+
+	if letter_at_cursor_right ~= " " then
+		padding_right = " "
+	end
+
+	local complete_text = left .. padding_left .. text .. padding_right .. right
 	vim.api.nvim_buf_set_lines(buffer, zero_based_line, zero_based_line + 1, false, { complete_text })
 end
 M.insert_text_at = insert_text_at_cursor
