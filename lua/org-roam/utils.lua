@@ -85,6 +85,19 @@ local function find_file_id(file_content)
 	end
 end
 
+local function find_file_title(str, fallback)
+	local titles = {}
+
+	for title in str:gmatch("#%+title:(.-)\n") do
+		table.insert(titles, title)
+	end
+	local title = fallback
+	if #titles ~= 0 then
+		title = titles[1]:gsub("^%s*(.-)%s*$", "%1")
+	end
+	return title
+end
+
 local function process_file(filepath, post_hook)
 	-- process orgfile only
 	if is_org_file(filepath) == false then
@@ -184,6 +197,8 @@ local function build_database(dbpath, roam_folder, table_name)
 			file_path = "text",
 			file_id = "text",
 			id_links = "text",
+			file_title = "text",
+			title = "text",
 		})
 	end
 
@@ -197,6 +212,7 @@ local function build_database(dbpath, roam_folder, table_name)
 					file_id = matches.file_id,
 					file_path = matches.file_path,
 					id_links = vim.json.encode(matches.id_links),
+					title = M.get_filename_from_path(matches.file_path),
 				})
 			else
 				-- NOTE: some times I could not update
@@ -214,6 +230,7 @@ local function build_database(dbpath, roam_folder, table_name)
 						file_id = matches.file_id,
 						file_path = matches.file_path,
 						id_links = vim.json.encode(matches.id_links),
+						title = M.get_filename_from_path(matches.file_path),
 					},
 				})
 				--
@@ -243,6 +260,7 @@ M.read_lines_from_file = read_lines_from_file
 M.build_database = build_database
 M.process_folder = process_folder
 M.find_file_id = find_file_id
+M.find_file_title = find_file_title
 
 local function get_letter_at_index(str, index)
 	return string.sub(str, index, index)
@@ -280,5 +298,15 @@ local function insert_text_at_cursor(buffer, text)
 	vim.api.nvim_buf_set_lines(buffer, zero_based_line, zero_based_line + 1, false, { complete_text })
 end
 M.insert_text_at = insert_text_at_cursor
+
+local function get_filename_from_path(file_path)
+	local split_path = {}
+	for part in string.gmatch(file_path, "([^/]+)") do
+		table.insert(split_path, part)
+	end
+	return split_path[#split_path] -- Return the last element
+end
+
+M.get_filename_from_path = get_filename_from_path
 
 return M

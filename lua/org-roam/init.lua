@@ -123,6 +123,10 @@ local function org_roam_buffer_toggle()
 	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 	local content = table.concat(lines, "\n")
 	local id = utils.find_file_id(content)
+	local current_file_path = vim.api.nvim_buf_get_name(0)
+	local filename = utils.get_filename_from_path(current_file_path)
+	local fallback_title = filename
+	local title = utils.find_file_title(content, fallback_title)
 	local back_links = utils.get_back_links(id, user_config.org_roam_database_file, "example_table")
 	local locations = {}
 	for _, back_link in ipairs(back_links) do
