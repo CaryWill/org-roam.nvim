@@ -131,9 +131,7 @@ local function org_roam_capture(title)
 		-- Add two new empty lines
 		vim.api.nvim_buf_set_lines(buf, line_count, line_count, false, { "", "" })
 		-- Move the cursor to the new empty line
-		vim.api.nvim_win_set_cursor(0, { line_count + 1, 0 })
-		-- Switch to insert mode
-		vim.api.nvim_set_option("cursorline", true)
+		vim.api.nvim_win_set_cursor(0, { line_count + 2, 0 })
 		vim.api.nvim_input("i")
 	end
 end
