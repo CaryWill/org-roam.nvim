@@ -244,4 +244,25 @@ M.build_database = build_database
 M.process_folder = process_folder
 M.find_file_id = find_file_id
 
+local function get_line_from_buffer(buffer, line_number)
+	local zero_based_line = line_number - 1
+	local lines = vim.api.nvim_buf_get_lines(buffer, zero_based_line, line_number, false)
+	return lines[1]
+end
+local function insert_text_at_cursor(buffer, text)
+	local line = vim.api.nvim_win_get_cursor(0)[1]
+	local col = vim.api.nvim_win_get_cursor(0)[2]
+	local zero_based_line = line - 1
+
+	local current_line = get_line_from_buffer(0, line)
+	local split_point = col
+	local left = current_line:sub(1, split_point)
+	local right = current_line:sub(split_point + 1)
+	local complete_text = left .. text .. right
+	vim.g.t = { left, right, text }
+
+	vim.api.nvim_buf_set_lines(buffer, zero_based_line, zero_based_line + 1, false, { complete_text })
+end
+M.insert_text_at = insert_text_at_cursor
+
 return M

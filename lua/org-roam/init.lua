@@ -46,6 +46,7 @@ local function org_roam_capture(title)
 	end
 
 	-- capture zettles
+	-- TODO: default value, when you can just press enter
 	local selected_zettle_path = ""
 	if user_config.org_roam_zettle_paths ~= nil or #user_config.org_roam_zettle_paths > 0 then
 		local org_roam_zettle_paths = user_config.org_roam_zettle_paths
@@ -161,7 +162,11 @@ local function org_roam_buffer_toggle()
 end
 
 -- find all nodes
-local function org_roam_node_find()
+local function org_roam_node_find(opts)
+	-- if you use it when in node insert
+	opts = opts or {}
+	local link_type = opts.link_type or nil
+
 	local db = sqlite:open(user_config.org_roam_database_file)
 	local nodes = db:select("example_table")
 	db:close()
@@ -172,10 +177,10 @@ local function org_roam_node_find()
 		nodes[i].pos = 0
 	end
 
-	local telescope_picker = function(opts)
-		opts = opts or {}
+	local telescope_picker = function(telescope_picker_opts)
+		telescope_picker_opts = telescope_picker_opts or {}
 		pickers
-			.new(opts, {
+			.new(telescope_picker_opts, {
 				prompt_title = "Find Node",
 				finder = finders.new_table({
 					results = nodes,
@@ -201,7 +206,6 @@ local function org_roam_node_find()
 							org_roam_capture(title)
 						else
 							local file = selection.value.file
-							vim.g.file = selection.value.file
 							local pos = selection.value.pos
 							local row = 1
 
@@ -214,7 +218,17 @@ local function org_roam_node_find()
 								row = row + 1
 							end
 
-							vim.cmd.edit(selection.value.file)
+							-- insert link
+							if link_type then
+								local buffer = 0
+								local start_row = opts.line
+								local end_row = start_row
+								local start_col = opts.col
+								local end_col = #selection.value.id
+								utils.insert_text_at(buffer, selection.value.id)
+							else
+								vim.cmd.edit(selection.value.file)
+							end
 							-- TODO Set the cursor in correct place
 							-- aka mimic emacs `goto-char' function
 							-- vim.api.nvim_win_set_cursor(0, { row, 0 })
@@ -222,7 +236,7 @@ local function org_roam_node_find()
 					end)
 					return true
 				end,
-				sorter = conf.generic_sorter(opts),
+				sorter = conf.generic_sorter(telescope_picker_opts),
 			})
 			:find()
 	end
@@ -253,6 +267,22 @@ local orgRoamGraphData = {
 	tags = {},
 }
 
+-- select link type(like id link type)
+-- select node
+local function org_roam_node_insert()
+	local line = vim.api.nvim_win_get_cursor(0)[1]
+	local col = vim.api.nvim_win_get_cursor(0)[2]
+	local link_types = { "id", "file", "cite" }
+	local selected_link_type = link_types[1]
+	for i, item in ipairs(link_types) do
+		link_types[i] = string.format("%d. %s", i, item)
+	end
+	-- Prompt the user with a selection list
+	local choice = vim.fn.inputlist(link_types)
+	selected_link_type = link_types[choice]:match("%d+%. (.+)")
+	org_roam_node_find({ link_type = selected_link_type, line = line, col = col })
+end
+
 _G.GetLatestGraphData = function()
 	-- TODO: build database will be time consuming if your notes grow larger?
 	-- for now just rebuild everytime this function is called
@@ -268,4 +298,5 @@ return {
 	org_roam_capture = org_roam_capture,
 	org_roam_buffer_toggle = org_roam_buffer_toggle,
 	org_roam_node_find = org_roam_node_find,
+	org_roam_node_insert = org_roam_node_insert,
 }
