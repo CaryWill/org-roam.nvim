@@ -2,6 +2,11 @@ local utils = require("org-roam.utils")
 local default_args = require("org-roam.default-args")
 local sqlite = require("sqlite")
 local luv = require("luv")
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local conf = require("telescope.config").values
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
 
 -- TODO:
 -- 1. Find all id links in containing file,
@@ -104,7 +109,8 @@ local function org_roam_capture(title)
 	end
 end
 
-local function org_roam_node_find()
+-- find all backlinks
+local function org_roam_buffer_toggle()
 	-- build the database
 	utils.build_database(user_config.org_roam_database_file, user_config.org_roam_directory, "example_table")
 
@@ -154,6 +160,75 @@ local function org_roam_node_find()
 	-- I use location list first here
 end
 
+-- find all nodes
+local function org_roam_node_find()
+	local db = sqlite:open(user_config.org_roam_database_file)
+	local nodes = db:select("example_table")
+	db:close()
+
+	for i, item in ipairs(nodes) do
+		nodes[i].title = nodes[i].file_path
+		nodes[i].file = nodes[i].file_path
+		nodes[i].pos = 0
+	end
+
+	local telescope_picker = function(opts)
+		opts = opts or {}
+		pickers
+			.new(opts, {
+				prompt_title = "Find Node",
+				finder = finders.new_table({
+					results = nodes,
+					entry_maker = function(entry)
+						-- because of the way org-roam stores these in database
+						-- entry.title = string.sub(entry.title, 2, -2)
+						-- entry.file = string.sub(entry.file, 2, -2)
+
+						return {
+							value = entry,
+							display = entry.title,
+							ordinal = entry.title,
+						}
+					end,
+				}),
+
+				attach_mappings = function(prompt_bufnr, _)
+					actions.select_default:replace(function()
+						actions.close(prompt_bufnr)
+						local selection = action_state.get_selected_entry()
+						if selection == nil then
+							local title = action_state.get_current_line()
+							org_roam_capture(title)
+						else
+							local file = selection.value.file
+							vim.g.file = selection.value.file
+							local pos = selection.value.pos
+							local row = 1
+
+							for line in io.lines(file) do
+								if pos < line:len() then
+									break
+								else
+									pos = pos - line:len()
+								end
+								row = row + 1
+							end
+
+							vim.cmd.edit(selection.value.file)
+							-- TODO Set the cursor in correct place
+							-- aka mimic emacs `goto-char' function
+							-- vim.api.nvim_win_set_cursor(0, { row, 0 })
+						end
+					end)
+					return true
+				end,
+				sorter = conf.generic_sorter(opts),
+			})
+			:find()
+	end
+	telescope_picker()
+end
+
 -- NOTE: data should look like this
 local orgRoamGraphData = {
 	nodes = {
@@ -191,5 +266,6 @@ end
 return {
 	setup = setup,
 	org_roam_capture = org_roam_capture,
+	org_roam_buffer_toggle = org_roam_buffer_toggle,
 	org_roam_node_find = org_roam_node_find,
 }
