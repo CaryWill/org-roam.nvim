@@ -300,6 +300,17 @@ _G.GetLatestGraphData = function()
 	return vim.json.encode(records)
 end
 
+-- it will be used in orgmode id link
+vim.fn.open_id_link_at = function(id)
+	local db = sqlite:open(user_config.org_roam_database_file)
+	local records = db:select("example_table", { where = { file_id = id } })
+	if #records > 0 then
+		vim.cmd.edit(records[1].file_path)
+	else
+		print("not found:" .. id)
+	end
+end
+
 return {
 	setup = setup,
 	org_roam_capture = org_roam_capture,
