@@ -48,6 +48,7 @@ local function org_roam_capture(title)
 	-- capture zettles
 	-- TODO: default value, when you can just press enter
 	local selected_zettle_path = ""
+	local choice_name = ""
 	if user_config.org_roam_zettle_paths ~= nil or #user_config.org_roam_zettle_paths > 0 then
 		local org_roam_zettle_paths = user_config.org_roam_zettle_paths
 		for i, item in ipairs(org_roam_zettle_paths) do
@@ -55,7 +56,8 @@ local function org_roam_capture(title)
 		end
 		-- Prompt the user with a selection list
 		local choice = vim.fn.inputlist(org_roam_zettle_paths)
-		selected_zettle_path = org_roam_zettle_paths[choice]:match("%d+%. (.+)") .. "/"
+		choice_name = org_roam_zettle_paths[choice]:match("%d+%. (.+)")
+		selected_zettle_path = choice_name .. "/"
 	end
 
 	-- Replace all non-alphanumeric characters with an underscore
@@ -74,7 +76,24 @@ local function org_roam_capture(title)
 	local uuid = utils.get_uuid()
 	local date_str = os.date("[%Y-%m-%d %a %H:%M]")
 	-- TODO: support template, you can refer to neovim orgmode's template impl
-	local node_head = ":PROPERTIES:\n:ID: " .. uuid .. "\n:END:\n#+title: " .. title .. "\n#+date: " .. date_str
+	-- other properties
+	local other_properties = ""
+	-- i dont know what to call it, like #+filetags
+	local others = "\n#+filetags: :draft:"
+	if choice_name ~= nil and choice_name == "main" then
+		other_properties = ""
+	end
+
+	local node_head = ":PROPERTIES:\n:ID: "
+		.. uuid
+		.. "\n"
+		.. other_properties
+		.. ":END:\n#+title: "
+		.. title
+		.. "\n#+date: "
+		.. date_str
+		.. others
+		.. "\n"
 	local file_path = (user_config.org_roam_capture_directory or user_config.org_roam_directory)
 		.. selected_zettle_path
 		.. filename
@@ -107,6 +126,15 @@ local function org_roam_capture(title)
 
 		-- go to the created file editing
 		vim.cmd.edit(file_path)
+		local buf = vim.api.nvim_get_current_buf()
+		local line_count = vim.api.nvim_buf_line_count(buf)
+		-- Add two new empty lines
+		vim.api.nvim_buf_set_lines(buf, line_count, line_count, false, { "", "" })
+		-- Move the cursor to the new empty line
+		vim.api.nvim_win_set_cursor(0, { line_count + 1, 0 })
+		-- Switch to insert mode
+		vim.api.nvim_set_option("cursorline", true)
+		vim.api.nvim_input("i")
 	end
 end
 
