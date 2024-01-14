@@ -176,7 +176,7 @@ local function org_roam_node_find(opts)
 	db:close()
 
 	for i, item in ipairs(nodes) do
-		nodes[i].title = nodes[i].file_path
+		nodes[i].title = nodes[i].title
 		nodes[i].file = nodes[i].file_path
 		nodes[i].pos = 0
 	end
