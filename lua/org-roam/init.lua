@@ -49,7 +49,7 @@ local function org_roam_capture(title)
 	-- TODO: default value, when you can just press enter
 	local selected_zettle_path = ""
 	local choice_name = ""
-	if user_config.org_roam_zettle_paths ~= nil or #user_config.org_roam_zettle_paths > 0 then
+	if user_config.org_roam_zettle_paths ~= nil then
 		local org_roam_zettle_paths = user_config.org_roam_zettle_paths
 		for i, item in ipairs(org_roam_zettle_paths) do
 			org_roam_zettle_paths[i] = string.format("%d. %s", i, item)
@@ -126,13 +126,13 @@ local function org_roam_capture(title)
 
 		-- go to the created file editing
 		vim.cmd.edit(file_path)
-		local buf = vim.api.nvim_get_current_buf()
-		local line_count = vim.api.nvim_buf_line_count(buf)
+		-- local buf = vim.api.nvim_get_current_buf()
+		-- local line_count = vim.api.nvim_buf_line_count(buf)
 		-- Add two new empty lines
-		vim.api.nvim_buf_set_lines(buf, line_count, line_count, false, { "", "" })
+		-- vim.api.nvim_buf_set_lines(buf, line_count, line_count, false, { "", "" })
 		-- Move the cursor to the new empty line
-		vim.api.nvim_win_set_cursor(0, { line_count + 2, 0 })
-		vim.api.nvim_input("i")
+		-- vim.api.nvim_win_set_cursor(0, { line_count + 2, 0 })
+		-- vim.api.nvim_input("i")
 	end
 end
 
